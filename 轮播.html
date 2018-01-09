@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>轮播</title>
+    <link rel="stylesheet" href="https://at.alicdn.com/t/font_536032_de7yqxwc4lmzpvi.css">
+    <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .clearfix::after {
+            content: '';
+            clear: both;
+            display: block;
+        }
+
+        .wrap {
+            width: 320px;
+            height: 180px;
+            position: relative;
+            margin: 30px auto;
+            overflow: hidden;
+        }
+
+        .wrap > .panel img {
+            width: 320px;
+            height: 180px;
+        }
+
+        .wrap > .panel {
+            position: absolute;
+        }
+
+        .wrap > .panel > li {
+            float: left;
+        }
+
+        .wrap > .iconfont {
+            display: inline-block;
+            position: absolute;
+            top: 50%;
+            width: 30px;
+            height: 30px;
+            margin-top: -15px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            font-size: 20px;
+            color: #fff;
+            text-align: center;
+            line-height: 32px;
+            cursor: pointer;
+        }
+
+        .icon-aleft {
+            left: 10px;
+        }
+
+        .icon-rightward {
+            right: 10px;
+        }
+
+        .wrap > .iconfont:hover {
+            opacity: 0.8;
+        }
+
+        .btn {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .btn > li {
+            width: 30px;
+            height: 5px;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            display: inline-block;
+            cursor: pointer;
+            margin: 0 3px;
+        }
+
+        .btn > .active {
+            background: #ccc;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <ul class="panel clearfix">
+        <li><a href="#"><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnae9gphzdj22oc1i71kx.jpg" alt=""></a></li>
+        <li><a href="#"><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaea2ovnqj21jk0v979o.jpg" alt=""></a></li>
+        <li><a href="#"><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaeabpsm1j21hb0u0aj3.jpg" alt=""></a></li>
+        <li><a href="#"><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaeaiypnqj23zl28se82.jpg" alt=""></a></li>
+    </ul>
+    <span class="iconfont icon-aleft"></span>
+    <span class="iconfont icon-rightward"></span>
+    <ul class="btn">
+        <li class="active"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div>
+
+<div class="wrap">
+    <ul class="panel clearfix">
+        <li><a href=""><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnae9gphzdj22oc1i71kx.jpg" alt=""></a></li>
+        <li><a href=""><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaea2ovnqj21jk0v979o.jpg" alt=""></a></li>
+        <li><a href=""><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaeabpsm1j21hb0u0aj3.jpg" alt=""></a></li>
+        <li><a href=""><img src="https://ws1.sinaimg.cn/large/b44f5fbfgy1fnaeaiypnqj23zl28se82.jpg" alt=""></a></li>
+    </ul>
+    <span class="iconfont icon-aleft"></span>
+    <span class="iconfont icon-rightward"></span>
+    <ul class="btn">
+        <li class="active"></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+</div>
+<script>
+    function carousel($ct) {
+        this.init($ct)
+    }
+
+    carousel.prototype = {
+        init: function ($ct) {
+            this.$ct = $ct
+            this.$panel = this.$ct.find('.panel')
+            this.$img = this.$panel.find('li')
+            this.$aleft = this.$ct.find('.icon-aleft')
+            this.$rightward = this.$ct.find('.icon-rightward')
+            this.$btn = this.$ct.find('.btn li')
+            this.imgCount = this.$img.length
+            this.imgWidth = this.$img.width()
+            this.$panel.append(this.$img.first().clone())
+            this.$panel.prepend(this.$img.last().clone())
+            this.$panel.css({'width': (this.imgCount + 2) * this.imgWidth, 'left': -this.imgWidth})
+            this.index = 0
+            this.isAnimate = false
+            this.bind()
+            this.autoPlay()
+        },
+        bind: function () {
+            var _this = this
+            this.$rightward.on('click', function () {
+                _this.isRightward(1)
+            })
+            this.$aleft.on('click', function () {
+                _this.isAleft(1)
+            })
+            this.$btn.on('click', function () {
+                var index = $(this).index()
+                if (_this.index > index) {
+                    _this.isAleft(_this.index - index)
+                } else {
+                    _this.isRightward(index - _this.index)
+                }
+            })
+        },
+
+        isRightward: function (len) {
+            if (this.isAnimate) return
+            this.isAnimate = true
+            var _this = this
+            this.$panel.animate({
+                left: '-=' + this.imgWidth * len
+            }, function () {
+                _this.index += len
+                if (_this.index === _this.imgCount) {
+                    _this.$panel.css('left', -_this.imgWidth)
+                    _this.index = 0
+                }
+                _this.setBtn()
+                _this.isAnimate = false
+            })
+        },
+        isAleft: function (len) {
+            if (this.isAnimate) return
+            this.isAnimate = true
+            var _this = this
+            this.$panel.animate({
+                left: '+=' + this.imgWidth * len
+            }, function () {
+                _this.index -= len
+                if (_this.index < 0) {
+                    _this.$panel.css('left', -_this.imgWidth * _this.imgCount)
+                    _this.index = _this.imgCount - 1
+                }
+                _this.setBtn()
+                _this.isAnimate = false
+            })
+        },
+        setBtn: function () {
+            this.$btn.eq(this.index).addClass('active').siblings().removeClass('active')
+        },
+        autoPlay: function () {
+            var _this = this
+            this.autoClock = setInterval(function () {
+                _this.isRightward(1)
+            }, 5000)
+        },
+        stopAuto: function () {
+            clearInterval(this.autoClock)
+        }
+    }
+
+    var a = new carousel($('.wrap').eq(0))
+    var b = new carousel($('.wrap').eq(1))
+</script>
+</body>
+</html>
